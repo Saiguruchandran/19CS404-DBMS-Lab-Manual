@@ -1,6 +1,4 @@
 # ER Diagram Workshop – Submission Template
-## Name: saiguruchandran g
-## Regno: 212223240143
 
 ## Objective
 To understand and apply ER modeling concepts by creating ER diagrams for real-world applications.
@@ -25,47 +23,30 @@ FlexiFit Gym wants a database to manage its members, trainers, and fitness progr
 
 ### ER Diagram:
 *Paste or attach your diagram here*  
-![ER Diagram](er_diagram_fitness.png)
+<img width="798" height="492" alt="image" src="https://github.com/user-attachments/assets/8d458f88-130a-4d22-9a54-217aaa96d981" />
 
-<img width="981" height="704" alt="image" src="https://github.com/user-attachments/assets/a1ac6074-4c46-413c-8cdb-8fca0d4e7896" />
 
 ### Entities and Attributes
-| **Entity**     | **Attributes (PK, FK)**                                              | **Notes**                                                        |
-| -------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| **Member**     | **MemberID (PK)**, Name, Age                                         | Members join programs, make payments, book sessions.             |
-| **Program**    | **ProgramID (PK)**, Name, Schedule                                   | Programs have members and assigned trainers.                     |
-| **Trainer**    | **TrainerID (PK)**, Name, Specialization                             | Trainers conduct sessions and take attendance.                   |
-| **Session**    | **SessionID (PK)**, Date, Time, **TrainerID (FK)**                   | Sessions are conducted by a trainer and are bookable by members. |
-| **Payment**    | **PaymentID (PK)**, Amount, Date, Type, **MemberID (FK)**            | Members make payments.                                           |
-| **Attendance** | **AttendanceID (PK)**, Status, **SessionID (FK)**, **MemberID (FK)** | Captures member attendance for a session.                        |
 
+Member (MemberID, Name, MembershipType, StartDate)
+ Program (ProgramID, ProgramName, Description)
+ Trainer (TrainerID, Name, Specialization)
+ PersonalSession (SessionID, Date, Time, MemberID (FK), TrainerID (FK))
+ Attendance (AttendanceID, SessionID (FK), MemberID (FK), Status)
+ Payment (PaymentID, MemberID (FK), Amount, PaymentDate,
+PaymentType)
 ### Relationships and Constraints
 
-| **Relationship**                     | **Cardinality**                        | **Participation**                           | **Notes**                                                                       |
-| ------------------------------------ | -------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------- |
-| **Member — Join — Program**          | M : 1                                  | Member (optional), Program (mandatory)      | A member can join multiple programs; a program has many members.                |
-| **Program — Assigned To — Trainer**  | M : 1                                  | Program (mandatory), Trainer (optional)     | Each program is handled by one trainer; a trainer can handle multiple programs. |
-| **Trainer — Conducted By — Session** | 1 : M                                  | Trainer (mandatory), Session (mandatory)    | Each session is conducted by exactly one trainer.                               |
-| **Member — Books — Session**         | M : M                                  | Optional for both                           | Members can book multiple sessions; sessions can be booked by many members.     |
-| **Member — Make — Payment**          | 1 : M                                  | Member (mandatory), Payment (mandatory)     | Each payment belongs to one member; members can make multiple payments.         |
-| **Trainer — Take — Attendance**      | 1 : M                                  | Trainer (mandatory), Attendance (mandatory) | Trainer records attendance for many session-member pairs.                       |
-| **Member & Session — Attendance**    | M : M (resolved via Attendance entity) | Attendance is mandatory for record          | Tracks attendance per session per member.                                       |
-
+Member ↔ Program → M:N
+ Trainer ↔ Program → M:N
+ Member ↔ PersonalSession → 1:N
+ PersonalSession ↔ Attendance ↔ Member → M:N
+ Member ↔ Payment → 1:N
 ### Assumptions
-
-A session is always conducted by one trainer.
-
-Members can join zero or many programs.
-
-A program must have a trainer assigned (based on diagram’s participation).
-
-A member may book sessions independently of joining programs.
-
-Attendance is only recorded for booked sessions.
-
-Payment does not depend on programs or sessions; a member simply makes payments.
-
-Booking relationship between Member and Session is M:N but represented implicitly through Attendance (or could be a separate link table).
+-Programs and trainers can exist without members.
+-Attendance is recorded per session per member.
+-Payments are linked to members (membership/session)
+---
 
 # Scenario B: City Library Event & Book Lending System
 
@@ -82,49 +63,30 @@ The Central Library wants to manage book lending and cultural events.
 
 ### ER Diagram:
 *Paste or attach your diagram here*  
-![ER Diagram](er_diagram_library.png)
+<img width="776" height="518" alt="image" src="https://github.com/user-attachments/assets/484d627f-17ee-44ca-b7d6-2bb79c0e97d7" />
 
-<img width="832" height="636" alt="image" src="https://github.com/user-attachments/assets/4cd40594-a25c-4cf1-84eb-94e85eeb1b6d" />
 
 ### Entities and Attributes
-| **Entity**         | **Attributes (PK, FK)**                                        | **Notes**                                                     |
-| ------------------ | -------------------------------------------------------------- | ------------------------------------------------------------- |
-| **Member**         | **MemberID (PK)**, Name, Email                                 | A member can make loans and attend events.                    |
-| **Loan**           | **LoanID (PK)**, BorrowDate, LoanExpiryDate, **MemberID (FK)** | A loan is made by one member and covers one book.             |
-| **Book**           | **ISBN (PK)**, Name, Author                                    | A book can be part of many loans.                             |
-| **Fine**           | **FineID (PK)**, Amount, DateExceeded, **LoanID (FK)**         | A fine is generated when a loan exceeds expiry.               |
-| **Event**          | **EventID (PK)**, Date, Time, Venue                            | Members attend events; events use rooms.                      |
-| **Rooms**          | **RoomNumber (PK)**, Capacity, Availability                    | Rooms are used for events and host an author/speaker session. |
-| **Author/Speaker** | **SpeakerID (PK)**, Name, GenreFocus                           | Conducts events in rooms.                                     |
-
+Member, Book, Loan, Event, Speaker, EventRegistration, Room,
+Fine.
+Attributes: Each entity has a PK (e.g., MemberID, BookID, EventID). Key
+details like Name, Title, Author, Category, Amount are included.
 
 ### Relationships and Constraints
-
-| **Relationship**                     | **Cardinality** | **Participation**                    | **Notes**                                                              |
-| ------------------------------------ | --------------- | ------------------------------------ | ---------------------------------------------------------------------- |
-| **Member – Makes – Loan**            | 1 : M           | Member (mandatory), Loan (mandatory) | One member can make many loans; each loan belongs to one member.       |
-| **Loan – Covers – Book**             | M : 1           | Loan (mandatory), Book (mandatory)   | A loan covers exactly one book; a book can appear in multiple loans.   |
-| **Loan – Generates – Fine**          | 1 : M           | Loan (optional), Fine (mandatory)    | A loan may generate zero or many fines; each fine belongs to one loan. |
-| **Member – Attends – Event**         | M : M           | Both optional                        | Members can attend many events; events have many attendees.            |
-| **Event – Use – Rooms**              | M : 1           | Event (mandatory), Rooms (optional)  | An event uses one room; a room can host many events.                   |
-| **Rooms – Conduct – Author/Speaker** | 1 : 1           | Both mandatory                       | One author/speaker conducts an event in exactly one room at a time.    |
-
-
+ Member–Loan–Book → M:N (resolved by Loan).
+o Member–EventRegistration–Event → M:N.
+o Event–Speaker → M:N.
+o Event–Room → 1:N.
+o Loan–Fine → 1:1 (if overdue).
 ### Assumptions
+- A book can be borrowed by one member at a time.-
+- Rooms are used for both study and events.
+- Fines apply only for late returns.
+- A member must exist to borrow books or join events.
+- Each event has at least one room and one speaker
+ 
 
-Each loan is strictly linked to one book (not multiple books per loan).
-
-A member can exist without creating loans or attending events.
-
-Fines only exist if a loan has exceeded its expiry date.
-
-Every event must be held in a room.
-
-Author/Speaker is treated as its own entity, not part of Member.
-
-Each event has one speaker, and each speaker conducts one event at a time.
-
-Room availability indicates whether the room can host events.
+---
 
 # Scenario C: Restaurant Table Reservation & Ordering
 
@@ -141,52 +103,47 @@ A popular restaurant wants to manage reservations, orders, and billing.
 
 ### ER Diagram:
 *Paste or attach your diagram here*  
-![ER Diagram](er_diagram_restaurant.png)
+<img width="859" height="486" alt="image" src="https://github.com/user-attachments/assets/6d022670-3e7b-48a0-ad8f-3929fdcf4479" />
 
-<img width="835" height="696" alt="image" src="https://github.com/user-attachments/assets/796fd0f8-1a5e-48c4-b353-d81640426f5f" />
 
 ### Entities and Attributes
 
-| **Entity**      | **Attributes (PK, FK)**                                             | **Notes**                                  |
-| --------------- | ------------------------------------------------------------------- | ------------------------------------------ |
-| **Customer**    | **CustomerID (PK)**, Name, PhoneNo                                  | Customers make reservations and pay bills. |
-| **Reservation** | **ReservationID (PK)**, Date, Time, NoOfGuests, **CustomerID (FK)** | Customers create reservations.             |
-| **Table**       | **TableNumber (PK)**, Capacity                                      | Tables are assigned to reservations.       |
-| **Waiter**      | **WaiterID (PK)**, Name                                             | Waiters are assigned to reservations.      |
-| **Order**       | **OrderID (PK)**, Time, **ReservationID (FK)**                      | Orders are linked to reservations.         |
-| **Dish**        | **DishID (PK)**, Name, Price, **CategoryID (FK)**                   | Dishes belong to categories.               |
-| **Category**    | **CategoryID (PK)**, CategoryName                                   | E.g., Starter, Main, Dessert.              |
-| **Bill**        | **BillID (PK)**, Amount, PaymentMethod, **CustomerID (FK)**         | Bills are paid by customers.               |
-
+o Customer: Stores customer details (CustomerID, Name, Phone).
+o Reservation: Tracks reservations with date, time, number of guests,
+and linked customer.
+o Order: Represents food orders linked to reservations.
+o Dishes: Stores dish details with category (starter, main, dessert).
+o Bills: Generated for each reservation, includes food and service
+charges.
+o Waiter: Assigned to reservations for service.
 
 
 ### Relationships and Constraints
 
-| **Relationship**                    | **Cardinality** | **Participation**                             | **Notes**                                                                                   |
-| ----------------------------------- | --------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| **Customer — Makes — Reservation**  | 1 : M           | Customer (mandatory), Reservation (mandatory) | A customer can make many reservations.                                                      |
-| **Customer — Pays — Bill**          | 1 : 1           | Both mandatory                                | One bill per customer per reservation.                                                      |
-| **Reservation — Assigned — Table**  | 1 : M           | Reservation (mandatory), Table (mandatory)    | One reservation uses exactly one table; a table can be used by many reservations over time. |
-| **Reservation — Assigned — Waiter** | 1 : M           | Reservation (mandatory), Waiter (optional)    | A reservation has one waiter; a waiter handles many reservations.                           |
-| **Reservation — Has — Order**       | 1 : M           | Reservation (mandatory), Order (optional)     | A reservation may place multiple orders.                                                    |
-| **Order — Contain — Dish**          | M : M           | Optional for both                             | An order contains multiple dishes; a dish can appear in many orders.                        |
-| **Dish — Under — Category**         | M : 1           | Dish (mandatory), Category (mandatory)        | Each dish belongs to exactly one category.                                                  |
+1. Customer – Reservation (1:M):
+A customer can make multiple reservations, but each reservation belongs to
+one customer.
+2. Reservation – Order (1:M):
+A reservation can have multiple orders; each order belongs to one
+reservation.
+3. Order – Dishes (M:N):
+An order can include multiple dishes, and a dish can appear in many orders
+(resolved via junction table if needed).
+4. Reservation – Bills (1:1):
+Each reservation generates exactly one bill.
+5. Reservation – Waiter (1:N):
+A waiter can serve many reservations, but each reservation is assigned to one
+waiter.
 
 ### Assumptions
-
-A reservation must be linked to a customer, table, and waiter.
-
-A customer pays exactly one bill per reservation.
-
-A dish cannot exist without belonging to a category.
-
-A reservation can have zero or many orders.
-
-Orders must belong to a reservation.
-
-A table may be assigned to many reservations over time, but one reservation gets only one table.
-
-Category names like starter/main/dessert are treated as attribute values, not entities.
+ A walk-in customer is treated the same as a reserved customer, with an
+immediate reservation created in the system.
+ Each reservation generates one consolidated bill, including both food and
+service charges.
+ Waiters are linked to reservations, not individual orders.
+ Dishes belong to predefined categories (starter, main course, dessert).
+ M:N relationship between orders and dishes may be implemented using a
+separate OrderDetails table in physical design.
 
 ## Instructions for Students
 
